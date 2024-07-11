@@ -1,0 +1,51 @@
+{
+	"name": "DestinationDataset_l8e",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"NombreEsquema": {
+				"type": "String",
+				"defaultValue": "dbo"
+			},
+			"NombreTabla": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10,
+				"scale": 0
+			},
+			{
+				"name": "FirstName",
+				"type": "varchar",
+				"precision": 0,
+				"scale": 0
+			},
+			{
+				"name": "LastName",
+				"type": "varchar",
+				"precision": 0,
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().NombreEsquema",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().NombreTabla",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,9 @@
+{
+	"name": "fabricadeboludeces",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "3b52bba0-36c9-4af2-934b-43f1bd894909",
+		"tenantId": "c7db5234-eb19-42fd-8840-a85829ea4628"
+	}
+}

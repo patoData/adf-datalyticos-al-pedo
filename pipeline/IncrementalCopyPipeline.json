@@ -1,0 +1,39 @@
+{
+	"name": "IncrementalCopyPipeline",
+	"properties": {
+		"description": "https://learn.microsoft.com/en-us/azure/data-factory/tutorial-incremental-copy-portal",
+		"activities": [
+			{
+				"name": "LookupOldWaterMarkActivity",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestinationDataset_l8e",
+						"type": "DatasetReference",
+						"parameters": {
+							"NombreEsquema": "dbo",
+							"NombreTabla": "watermarktable"
+						}
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2024-07-11T20:04:38Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
