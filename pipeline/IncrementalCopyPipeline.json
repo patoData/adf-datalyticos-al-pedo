@@ -18,6 +18,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT WatermarkValue AS campoX\nFROM dbo.watermarktable  \nWHERE TableName = '@{pipeline().parameters.NombreTabla}'\n\n",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -28,10 +32,45 @@
 							"NombreEsquema": "dbo",
 							"NombreTabla": "watermarktable"
 						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "LookupOldWaterMarkActivity",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "FechaVar",
+					"value": {
+						"value": "@activity('LookupOldWaterMarkActivity').output.value[0].campoX",
+						"type": "Expression"
 					}
 				}
 			}
 		],
+		"parameters": {
+			"NombreTabla": {
+				"type": "String"
+			}
+		},
+		"variables": {
+			"FechaVar": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"lastPublishTime": "2024-07-11T20:04:38Z"
 	},
