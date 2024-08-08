@@ -19,7 +19,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT WatermarkValue AS campoX\nFROM dbo.watermarktable  \nWHERE TableName = '@{pipeline().parameters.NombreTabla}'\n\n",
+							"value": "SELECT WatermarkValue AS campoX\nFROM dbo.watermarktable  \nWHERE TableName = '@{pipeline().parameters.NombreTablaOrigen}'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -30,39 +30,54 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"NombreEsquema": "dbo",
-							"NombreTabla": "watermarktable"
+							"NombreTabla": {
+								"value": "@pipeline().parameters.NombreTablaOrigen",
+								"type": "Expression"
+							}
 						}
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "Set variable1",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "LookupOldWaterMarkActivity",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"name": "LookupNewWaterMarkActivity",
+				"type": "Lookup",
+				"dependsOn": [],
 				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "FechaVar",
-					"value": {
-						"value": "@activity('LookupOldWaterMarkActivity').output.value[0].campoX",
-						"type": "Expression"
-					}
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select max(LastModifytime) as maximo\nfrom [dbo].[@{pipeline().parameters.NombreTablaOrigen}]",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DestinationDataset_l8e",
+						"type": "DatasetReference",
+						"parameters": {
+							"NombreEsquema": "dbo",
+							"NombreTabla": {
+								"value": "@pipeline().parameters.NombreTablaOrigen",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
 				}
 			}
 		],
 		"parameters": {
-			"NombreTabla": {
+			"NombreTablaOrigen": {
 				"type": "String"
 			}
 		},
