@@ -55,7 +55,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select max(LastModifytime) as maximo\nfrom [dbo].[@{pipeline().parameters.NombreTablaOrigen}]",
+							"value": "select max(LastModifytime) as NewWatermarkvalue\nfrom [dbo].[@{pipeline().parameters.NombreTablaOrigen}]",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -74,6 +74,54 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "LookupOldWaterMarkActivity",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "LookupNewWaterMarkActivity",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select * \r\nfrom data_source_table \r\nwhere LastModifytime > '@{activity('LookupOldWaterMarkActivity').output.firstRow.WatermarkValue}' \r\n    and LastModifytime <= '@{activity('LookupNewWaterMarkActivity').output.firstRow.NewWatermarkvalue}'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DestinationDataset_l8e",
+						"type": "DatasetReference",
+						"parameters": {
+							"NombreEsquema": "dbo",
+							"NombreTabla": {
+								"value": "@pipeline().parameters.NombreTablaOrigen",
+								"type": "Expression"
+							}
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
