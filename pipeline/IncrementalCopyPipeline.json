@@ -19,7 +19,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT WatermarkValue AS campoX\nFROM dbo.watermarktable  \nWHERE TableName = '@{pipeline().parameters.NombreTablaOrigen}'",
+							"value": "SELECT WatermarkValue\nFROM dbo.watermarktable  \nWHERE TableName = '@{pipeline().parameters.NombreTablaOrigen}'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -78,7 +78,12 @@
 		],
 		"parameters": {
 			"NombreTablaOrigen": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": "data_source_table"
+			},
+			"NombreTablaWatermark": {
+				"type": "string",
+				"defaultValue": "watermarktable"
 			}
 		},
 		"variables": {
